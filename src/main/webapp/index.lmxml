@@ -1,0 +1,187 @@
+html
+  head
+    title [try]
+    script { 
+      type: "text/javascript", 
+      src: "http://code.jquery.com/jquery-1.6.4.min.js"
+    }
+    script { type: "text/javascript" }
+      ```
+//<![CDATA[
+$(document).ready (function() {
+  var tab = "  ";
+
+  $(".lmxml").keydown(function(event) {
+    var keyCode = event.keyCode || event.which;
+
+    var t = event.target
+    var start = t.selectionStart
+
+    if (keyCode == 9) {
+      event.preventDefault();
+      
+      if (t.selectionStart == t.selectionEnd) {
+        t.value = t.value.slice(0, start).concat(tab).concat( 
+                  t.value.slice(start, t.value.length));
+        t.selectionStart = t.selectionEnd = start + tab.length;
+      }
+    } else if (keyCode == 8 && t.value.slice(start - tab.length, start) == tab) {
+      event.preventDefault();
+
+      if (t.selectionStart == t.selectionEnd) {
+        t.value = t.value.slice(0, start - tab.length).concat(
+                  t.value.slice(start, t.value.length));
+        t.selectionStart = t.selectionEnd = start - tab.length;
+      } else {
+        t.value = t.value.slice(0, start).concat(
+                  t.value.slice(t.selectionEnd, t.value.length));
+      }
+    }
+
+    if (event.metaKey == 1 && keyCode == 13) {
+      event.preventDefault();
+
+      $.post("/", { "lmxml-input": $(this).val() }, function(data) {
+        $(".lmxml_output").text(data);
+      });
+    }
+  });
+});
+//]]
+      ``` is unescaped
+    style { type: "text/css" }
+      ```
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: #555;
+}
+
+#page {
+  width: 80%;
+  background-color: #602463;
+  margin: auto auto;
+  border-radius: 10px 10px;
+  padding: 10px;
+  box-shadow: 10px 10px 10px #000;
+}
+
+#header {
+  width: 99%;
+  background-color: #703673;
+  border-radius: 10px 10px;
+  text-align: center;
+  color: #D092D4;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  margin: 5px auto;
+  border: 1px solid #9F46A3;
+}
+
+#header h1 {
+  font-family: Georgia;
+  font-size: 20px;
+}
+
+#content {
+  color: #D092D4;
+}
+
+#containers {
+  height: 350px;
+  overflow: auto;
+}
+
+.input {
+  float: left;
+  width: 49%;
+  padding-left: 5px;
+}
+
+.output {
+  float: right;
+  width: 49%;
+  height: 330px;
+}
+
+.lmxml {
+  background-color: #602463;
+  color: #D092D4;
+  border: 1px solid #9F46A3;
+  font-family: Monaco;
+  font-size: 12px;
+}
+
+.translate {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
+  color: #fab9fa;
+  padding: 8px 20px;
+  background: -moz-linear-gradient(
+    top,
+    #ffdbff 0%,
+    #cc86cc 25%,
+    #701270 75%,
+    #330833);
+  background: -webkit-gradient(
+    linear, left top, left bottom, 
+    from(#ffdbff),
+    color-stop(0.25, #cc86cc),
+    color-stop(0.75, #701270),
+    to(#330833));
+  border-radius: 12px;
+  -moz-border-radius: 12px;
+  -webkit-border-radius: 12px;
+  border: 1px solid #171717;
+  -moz-box-shadow:
+    0px 1px 3px rgba(000,000,000,0),
+    inset 0px 0px 10px rgba(087,087,087,0.7);
+  -webkit-box-shadow:
+    0px 1px 3px rgba(000,000,000,0),
+    inset 0px 0px 10px rgba(087,087,087,0.7);
+  text-shadow:
+    0px -1px 0px rgba(000,000,000,0.4),
+    0px 1px 0px rgba(255,255,255,0.3);
+}
+.translate:hover {
+  cursor: pointer;
+}
+      ```
+  body
+    div #page
+      div #header
+        h1
+          "XML is dead ... Long live XML!"
+      div #content
+        [rest]
+----
+[try]:
+  "Try LMXML"
+
+[rest]:
+  div #containers
+    div .input
+      form { method: "POST" }
+        textarea .lmxml { name: "lmxml-input", rows: "18", cols: "60" }
+          ```
+data
+   persons
+     person { name: "Tomcar", age: "999" }
+     person { name: "Cartom", age: "111" }
+   places
+     place "My House"
+     place "Their Home"
+          ```
+    div .output
+      pre .lmxml_output
+        ```
+<data>
+   <persons>
+     <person name="Tomcar" age="999"></person>
+     <person name="Cartom" age="111"></person>
+   </persons>
+   <places>
+     <place>My House</place>
+     <place>Their Home</place>
+   </places>
+</data>
+        ```
