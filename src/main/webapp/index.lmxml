@@ -19,6 +19,9 @@ html
         a .click_me img { src: "attention.png", alt: "Start here" }
         span .click_me { style: "font-size: 12px;" } "Reference"
         div #instructions { style: "display: none;" } [instructions]
+        span #run_link
+          "Run code with "
+          a .linker { href: "#", title: "Run LMXML Code" } "Ctrl/Cmd + Enter"
         [rest]
       div #footer
         "Visit "
@@ -32,7 +35,7 @@ html
     li "Quoted string are quoted"
     li "Multi-line strings are fenced in with " code "```" 
     li "Indention is important denoting sibling nodes and new-lines (default is 2 spaces)"
-    li "JSON-style sttributes"
+    li "JSON-style attributes"
     li "Class attributes can be simply prefixed with '.'"
     li "Id attributes can be simply prefixed with '#'"
     li "Markdown Indirect link style templates"
@@ -133,6 +136,11 @@ $(document).ready (function() {
     $("#error").show("fast").delay(2000).hide("fast")
   });
 
+  $(".linker").click(function() {
+    runCode();
+    return false;
+  });
+
   $(".click_me").click(function() {
     $("#instructions").toggle("fast");
   });
@@ -169,16 +177,20 @@ $(document).ready (function() {
     if (event.metaKey == 1 && keyCode == 13) {
       event.preventDefault();
 
-      $(this).attr("disabled", true);
-      $("#loading").show();
-
-      $.post("/", { "lmxml-input": $(this).val() }, function(data) {
-        $(".lmxml_output").text(data);
-        $("#loading").hide();
-        $(".lmxml").attr("disabled", false);
-      });
+      runCode();
     }
   });
+
+  function runCode() {
+    $(".lmxml").attr("disabled", true);
+    $("#loading").show();
+
+    $.post("/", { "lmxml-input": $(".lmxml").val() }, function(data) {
+      $(".lmxml_output").text(data);
+      $("#loading").hide();
+      $(".lmxml").attr("disabled", false);
+    });
+  }
 });
 //]]
     ``` is unescaped
@@ -256,6 +268,11 @@ body {
 #instructions pre {
   font-family: Monaco;
   border: 1px solid #9F46A3;
+}
+
+#run_link {
+  margin-left: 30px;
+  font-size: 13px;
 }
 
 .input {
