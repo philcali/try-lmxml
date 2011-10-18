@@ -30,7 +30,8 @@ class LmxmlPlan extends unfiltered.filter.Planify({
     ContentType("text/html") ~>
     ResponseString("<!DOCTYPE html>\n" + converted)
   case req @ POST(Path("/") & Params(LmxmlText(text))) =>
-    val xml = Printer.formatNodes(Lmxml.convert(text)(XmlConverter))
-    
-    ContentType("text/plain") ~> ResponseString(xml)
+    val resp = Lmxml(text).safeParseNodes(text).fold(_.toString, { parsed =>
+      Printer.formatNodes(XmlConverter.convert(parsed))
+    })
+    ContentType("text/plain") ~> ResponseString(resp)
 });
