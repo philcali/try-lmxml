@@ -5,10 +5,138 @@ html
       type: "text/javascript", 
       src: "http://code.jquery.com/jquery-1.6.4.min.js"
     }
-    script { type: "text/javascript" }
+    [javascript]
+    [styles]
+  body
+    div #page
+      div #error { style: "display: none;" }
+        "Error Loading Request... Try again?"
+      div #loading { style: "display: none;" }
+        img { src: "loading.gif" }
+      div #header
+        h1 "XML is dead ... Long live XML!"
+      div #content 
+        a .click_me img { src: "attention.png", alt: "Start here" }
+        span .click_me { style: "font-size: 12px;" } "Reference"
+        div #instructions { style: "display: none;" } [instructions]
+        [rest]
+      div #footer
+        "Visit "
+          a { href: "https://github.com/philcali" } "philcali"
+        " for more from the author."
+----
+[instructions]:
+  h2 "Quick Reference"
+  ul
+    li "Nodes are single words without spaces or hyphens"
+    li "Quoted string are quoted"
+    li "Multi-line strings are fenced in with " code "```" 
+    li "Indention is important denoting sibling nodes and new-lines (default is 2 spaces)"
+    li "JSON-style sttributes"
+    li "Class attributes can be simply prefixed with '.'"
+    li "Id attributes can be simply prefixed with '#'"
+    li "Markdown Indirect link style templates"
+    li "Indirect definitions are delimited from main document by " code "---"
+  h2 "HTML Example"
+  p "This " a { href: "index.lmxml" } "page"
+    " is an lmxml file."
+  p "Here is an example using LMXML to generate a HTML template."
+  pre ```
+html
+   head title "Title"
+   body [rest]
+---
+[rest]:
+   div #page
+     div #header h1 "Blog Title"
+     div #content div #posts posts [posts]
+ 
+[posts]:
+   div .post
+     div .post_title post_title
+     div .post_header post_body
       ```
+  p "Becomes:"
+  pre ```
+<html>
+  <head>
+    <title>Title</title>
+  </head>
+  <body>
+    <div id="page">
+      <div id="header">
+        <h1>Blog Title</h1>
+      </div>
+      <div id="content">
+        <div id="posts">
+          <posts>
+            <div class="post">
+              <div class="post_title">
+                <post_title></post_title>
+              </div>
+              <div class="post_header">
+                <post_body></post_body>
+              </div>
+            </div>
+          </posts>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+    ```
+
+[try]: "Try LMXML"
+
+[rest]:
+  div #containers div .input
+      form { method: "POST" }
+        textarea .lmxml { 
+          autofocus: "autofocus", 
+          name: "lmxml-input", 
+          rows: "18", 
+          cols: "60"
+        }
+          ```
+data
+   persons
+     person { name: "Tomcar", age: "999" }
+     person { name: "Cartom", age: "111" }
+   places
+     place "My House"
+     place "Their Home"
+          ```
+    div .output
+      pre .lmxml_output
+        ```
+<data>
+   <persons>
+     <person name="Tomcar" age="999"></person>
+     <person name="Cartom" age="111"></person>
+   </persons>
+   <places>
+     <place>My House</place>
+     <place>Their Home</place>
+   </places>
+</data>
+        ```
+
+[javascript]:
+  script { type: "text/javascript" }
+    ```
 //<![CDATA[
 $(document).ready (function() {
+
+  $(".lmxml").ajaxError(function() {
+    $("#loading").hide();
+    $(this).attr("disabled", false);
+    $("#error").show("fast").delay(2000).hide("fast")
+  });
+
+  $(".click_me").click(function() {
+    $("#instructions").toggle("fast");
+  });
+
   var tab = "  ";
 
   $(".lmxml").keydown(function(event) {
@@ -41,23 +169,42 @@ $(document).ready (function() {
     if (event.metaKey == 1 && keyCode == 13) {
       event.preventDefault();
 
+      $(this).attr("disabled", true);
+      $("#loading").show();
+
       $.post("/", { "lmxml-input": $(this).val() }, function(data) {
         $(".lmxml_output").text(data);
+        $("#loading").hide();
+        $(".lmxml").attr("disabled", false);
       });
     }
   });
 });
 //]]
-      ``` is unescaped
-    style { type: "text/css" }
-      ```
+    ``` is unescaped
+
+[styles]:
+  style { type: "text/css" }
+    ```
 body {
   font-family: Arial, Helvetica, sans-serif;
   background-color: #555;
 }
 
+#error {
+  background-color: #703673;
+  border-radius: 10px 10px;
+  border: 1px solid #9F46A3;
+  color: #DE3782;
+  padding: 10px;
+  box-shadow: 10px 10px 10px #000;
+  position: absolute;
+  left: 38%;
+  top: 40%;
+}
+
 #page {
-  width: 80%;
+  width: 90%;
   background-color: #602463;
   margin: auto auto;
   border-radius: 10px 10px;
@@ -91,6 +238,26 @@ body {
   overflow: auto;
 }
 
+#loading {
+  position: absolute;
+  left: 47%;
+  top: 45%;
+}
+
+#instructions {
+  padding: 10px;
+  background-color: #703673;
+  border-radius: 10px 10px;
+  border: 1px solid #9F46A3;
+  color: #D092D4;
+  margin: 8px;
+}
+
+#instructions pre {
+  font-family: Monaco;
+  border: 1px solid #9F46A3;
+}
+
 .input {
   float: left;
   width: 49%;
@@ -106,82 +273,26 @@ body {
 .lmxml {
   background-color: #602463;
   color: #D092D4;
-  border: 1px solid #9F46A3;
+  border: none;
   font-family: Monaco;
   font-size: 12px;
+  resize: none;
 }
 
-.translate {
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 14px;
-  color: #fab9fa;
-  padding: 8px 20px;
-  background: -moz-linear-gradient(
-    top,
-    #ffdbff 0%,
-    #cc86cc 25%,
-    #701270 75%,
-    #330833);
-  background: -webkit-gradient(
-    linear, left top, left bottom, 
-    from(#ffdbff),
-    color-stop(0.25, #cc86cc),
-    color-stop(0.75, #701270),
-    to(#330833));
-  border-radius: 12px;
-  -moz-border-radius: 12px;
-  -webkit-border-radius: 12px;
-  border: 1px solid #171717;
-  -moz-box-shadow:
-    0px 1px 3px rgba(000,000,000,0),
-    inset 0px 0px 10px rgba(087,087,087,0.7);
-  -webkit-box-shadow:
-    0px 1px 3px rgba(000,000,000,0),
-    inset 0px 0px 10px rgba(087,087,087,0.7);
-  text-shadow:
-    0px -1px 0px rgba(000,000,000,0.4),
-    0px 1px 0px rgba(255,255,255,0.3);
+.click_me:hover {
+  cursor: pointer;
 }
+
 .translate:hover {
   cursor: pointer;
 }
-      ```
-  body
-    div #page
-      div #header
-        h1
-          "XML is dead ... Long live XML!"
-      div #content
-        [rest]
-----
-[try]:
-  "Try LMXML"
 
-[rest]:
-  div #containers
-    div .input
-      form { method: "POST" }
-        textarea .lmxml { name: "lmxml-input", rows: "18", cols: "60" }
-          ```
-data
-   persons
-     person { name: "Tomcar", age: "999" }
-     person { name: "Cartom", age: "111" }
-   places
-     place "My House"
-     place "Their Home"
-          ```
-    div .output
-      pre .lmxml_output
-        ```
-<data>
-   <persons>
-     <person name="Tomcar" age="999"></person>
-     <person name="Cartom" age="111"></person>
-   </persons>
-   <places>
-     <place>My House</place>
-     <place>Their Home</place>
-   </places>
-</data>
-        ```
+#footer {
+  font-size: 13px;
+  color: #D092D4;
+}
+
+a, a:visited {
+  color: #4263CF;
+}
+    ```
