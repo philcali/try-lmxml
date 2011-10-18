@@ -24,12 +24,15 @@ object Printer extends PrettyPrinter(150, 2)
 
 /** unfiltered plan */
 class LmxmlPlan extends unfiltered.filter.Planify({
+  case req @ GET(Path("/index.lmxml")) =>
+    val template = Template(req)
+    ContentType("text/plain") ~> ResponseString(template("index"))
   case req @ GET(Path("/")) =>
     val template = Template(req)
     val converted = Lmxml.convert(template("index"))(XmlConverter)
     ContentType("text/html") ~>
     ResponseString("<!DOCTYPE html>\n" + converted)
-  case req @ POST(Path("/") & Params(LmxmlText(text))) =>
+  case POST(Path("/") & Params(LmxmlText(text))) =>
     val resp = Lmxml(text).safeParseNodes(text).fold(_.toString, { parsed =>
       Printer.formatNodes(XmlConverter.convert(parsed))
     })
