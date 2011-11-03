@@ -187,6 +187,10 @@ body {
   margin-bottom: 20px;
 }
 
+#reference:hover {
+  cursor: pointer;
+}
+
 textarea {
   width: 459px;
   height: 320px;
