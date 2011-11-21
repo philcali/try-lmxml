@@ -1,3 +1,5 @@
+"<!DOCTYPE html>" is unescaped
+
 html
   [head]
   body
@@ -51,9 +53,9 @@ html
 [instructions]:
   ul
     li "Nodes are single words without spaces"
-    li "Quoted string are quoted"
-    li "Multi-line strings are fenced in with " code "```" 
-    li "Indention is important denoting sibling nodes and new-lines (default is 2 spaces)"
+    li "Plain text is quoted is quoted"
+    li "Multi-line text is fenced in with " code "```" 
+    li "Indention is important, denoting sibling nodes and new-lines (default is 2 spaces)"
     li "JSON-style attributes"
     li "Attributes can be prefixed with " code "@"
     li "Class attributes can be simply prefixed with '.'"
@@ -62,6 +64,11 @@ html
     li "Markdown Indirect link style templates"
     li "Indirect definitions are delimited from main document by " code "---"
     li "Unparsed text is suffixed with " code "is unescaped"
+  span 
+    "More in-depth "
+      a @href = "https://github.com/philcali/lmxml/wiki/Syntax"
+        "syntax explanations"
+    " can be found on the wiki."
 
 [compiler]:
   div .span8
