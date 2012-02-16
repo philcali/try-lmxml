@@ -20,7 +20,7 @@ import com.google.appengine.api.memcache.{
 
 import scalendar._
 
-class AppEngineCache extends FileHashStorage {
+object AppEngineCache extends FileHashStorage {
   val cache = MemcacheServiceFactory.getMemcacheService("try-lmxml")
 
   def defaultExpiration = {

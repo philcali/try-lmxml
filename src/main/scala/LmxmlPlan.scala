@@ -27,11 +27,9 @@ object XmlFormat extends Function1[xml.NodeSeq, String] {
   def apply(nodes: xml.NodeSeq) = printer.formatNodes(nodes)
 }
 
-object Lmxml extends LmxmlFactory with Conversion {
-  def createParser(step: Int) = new PlainLmxmlParser(step) with HtmlShortcuts
-}
+class LmxmlPlan extends Plan with LmxmlFactory with FileHashes {
+  val storage = AppEngineCache
 
-class LmxmlPlan extends Plan with LmxmlFactory with FileLoading {
   lazy val base = config.getServletContext.getRealPath(".")
 
   def createParser(step: Int) = {
@@ -41,7 +39,7 @@ class LmxmlPlan extends Plan with LmxmlFactory with FileLoading {
   }
 
   def intent = {
-    case req @ GET(Path("/")) =>
+    case GET(Path("/")) =>
       val index = new java.io.File(base, "index.lmxml")
       val converted = this.fromFile(index)(XmlConvert)
 
@@ -52,7 +50,7 @@ class LmxmlPlan extends Plan with LmxmlFactory with FileLoading {
 
       val process = js andThen XmlConvert andThen XmlFormat
 
-      val resp = Lmxml(text).safeParseNodes(text).fold(_.toString, process)
+      val resp = apply(text).safeParseNodes(text).fold(_.toString, process)
       ContentType("text/plain") ~> ResponseString(resp)
   }
 }
