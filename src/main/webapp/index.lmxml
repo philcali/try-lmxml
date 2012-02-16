@@ -6,7 +6,7 @@
   >.container
     section
       >.page-header h1 "XML is dead... Long live XML!"
-      >#instructions .modal .hide
+      >#instructions .modal
         >.modal-header h2 "Quick Reference"
         >.modal-body [instructions]
       >#error .alert-message .error .fade .in @style: "display: none;"
@@ -15,8 +15,8 @@
         >.span12 
           span #reference .label .notice "Reference"
       >.row
-        [compiler]
         [output]
+        [compiler]
 
 [instructions]:
   ul
@@ -48,11 +48,24 @@
         ```
 data
    persons
-     person @name="Tomcar" @age="999"
-     person @name="Cartom" @age="111"
+     people
+       person @name="{name}" @age="{age}"
    places
-     place "My House"
-     place "Their Home"
+     locations
+       place name
+        ```
+      textarea .lmxml @name="lmxml-json"
+        ```
+{
+  "people": [
+    { "name": "Tomcar", "age": 999 },
+    { "name": "Cartom", "age": 111}
+  ],
+  "locations": [
+    { "name": "My House" },
+    { "name": "Their Home" }
+  ]
+}
         ```
       input #run_link { 
         class: "btn primary", 
@@ -86,6 +99,7 @@ data
 $(document).ready (function() {
 
   $("#instructions").modal({ keyboard: true, backdrop: true});
+  $("#instructions").modal('hide');
 
   $(".lmxml").ajaxError(function() {
     $(this).attr("disabled", false);
@@ -140,7 +154,12 @@ $(document).ready (function() {
   function runCode() {
     $(".lmxml").attr("disabled", true);
 
-    $.post("/", { "lmxml-input": $(".lmxml").val() }, function(data) {
+    var params = {
+      "lmxml-input": $("textarea[name=lmxml-input]").val(),
+      "lmxml-json":  $("textarea[name=lmxml-json]").val()
+    };
+
+    $.post("/", params, function(data) {
       $(".lmxml_output").text(data);
       $(".lmxml").attr("disabled", false);
     });

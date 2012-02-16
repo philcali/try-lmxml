@@ -4,6 +4,7 @@ package web
 import template.FileTemplates
 import cache.FileHashes
 import shortcuts.html.HtmlShortcuts
+import transforms.json.JSTransform
 
 import unfiltered.filter.Plan
 import unfiltered.request._
@@ -17,6 +18,9 @@ import xml.PrettyPrinter
 
 object LmxmlText extends 
   Params.Extract("lmxml-input", Params.first ~> Params.nonempty)
+
+object JSonText extends
+  Params.Extract("lmxml-json", Params.first ~> Params.nonempty)
 
 object XmlFormat extends Function1[xml.NodeSeq, String] {
   val printer = new PrettyPrinter(150, 2)
@@ -43,8 +47,11 @@ class LmxmlPlan extends Plan with LmxmlFactory with FileLoading {
 
       ContentType("text/html") ~>
       ResponseString(converted.toString)
-    case POST(Path("/") & Params(LmxmlText(text))) =>
-      val process = XmlConvert andThen XmlFormat
+    case POST(Path("/") & Params(LmxmlText(text)) & Params(JSonText(jsonStr))) =>
+      val js = JSTransform(jsonStr).getOrElse(transforms.Transform())
+
+      val process = js andThen XmlConvert andThen XmlFormat
+
       val resp = Lmxml(text).safeParseNodes(text).fold(_.toString, process)
       ContentType("text/plain") ~> ResponseString(resp)
   }
