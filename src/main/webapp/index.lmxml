@@ -1,54 +1,22 @@
-"<!DOCTYPE html>" is unescaped
-
-html
-  [head]
-  body
-    [topbar]
-    div .container
-      section
-        div .page-header h1 "XML is dead... Long live XML!"
-        div #instructions .modal .hide
-          div .modal-header h2 "Quick Reference"
-          div .modal-body [instructions]
-        div #error .alert-message .error .fade .in @style: "display: none;"
-          p "Error Loading Request... Try again?"
-        div .row
-          div .span16 
-            span #reference .label .notice "Reference"
-        div .row
-          [compiler]
-          [output]
-    footer p "&copy; Philip Cali 2011" is unescaped
+[base]
 ---
-[head]:
-  head
-    meta { charset: "utf-8" }
-    title [try]
-    [styles]
-    script { 
-      type: "text/javascript", 
-      src: "http://code.jquery.com/jquery-1.6.4.min.js"
-    }
-    script {
-      type: "text/javascript",
-      src: "http://twitter.github.com/bootstrap/1.3.0/bootstrap-modal.js"
-    }
-    script {
-      type: "text/javascript",
-      src: "http://twitter.github.com/bootstrap/1.3.0/bootstrap-alerts.js"
-    }
-    [javascript]
+[title]: "Try Lmxml"
 
-[topbar]:
-  div .topbar
-    div .fill
-      div .container
-        a .brand { href: "/" } [try]
-        ul .nav
-          li .active a { href: "/" } "Home"
-          li a { href: "https://raw.github.com/philcali/try-lmxml/master/src/main/webapp/index.lmxml"}
-              "Source"
-          li a { href: "https://github.com/philcali" } "Author"
+[contents]:
+  >.container
+    section
+      >.page-header h1 "XML is dead... Long live XML!"
+      >#instructions .modal .hide
+        >.modal-header h2 "Quick Reference"
+        >.modal-body [instructions]
+      >#error .alert-message .error .fade .in @style: "display: none;"
+        p "Error Loading Request... Try again?"
+      >.row
+        >.span12 
+          span #reference .label .notice "Reference"
+      >.row
+        [compiler]
+        [output]
 
 [instructions]:
   ul
@@ -71,7 +39,7 @@ html
     " can be found on the wiki."
 
 [compiler]:
-  div .span8
+  >.span6
     form { method: "POST" }
       textarea .lmxml {
         autofocus: "autofocus",
@@ -80,8 +48,8 @@ html
         ```
 data
    persons
-     person { name: "Tomcar", age: "999" }
-     person { name: "Cartom", age: "111" }
+     person @name="Tomcar" @age="999"
+     person @name="Cartom" @age="111"
    places
      place "My House"
      place "Their Home"
@@ -94,7 +62,7 @@ data
       p small "Also run with ctrl / cmd (on Mac) + enter"
 
 [output]:
-  div .span8
+  >.span6
     pre .lmxml_output
       ```
 <data>
@@ -180,37 +148,3 @@ $(document).ready (function() {
 });
 //]]
     ``` is unescaped
-
-[styles]:
-  link { rel: "stylesheet", href: "http://twitter.github.com/bootstrap/1.3.0/bootstrap.min.css" }
-  style { type: "text/css" }
-    ```
-body {
-  padding: 60px; 
-}
-
-.row {
-  margin-bottom: 10px;
-}
-
-.hero-unit {
-  margin-bottom: 20px;
-}
-
-#reference:hover {
-  cursor: pointer;
-}
-
-pre {
-  font-size: 14px;
-}
-
-textarea {
-  width: 459px;
-  height: 320px;
-  border: none;
-  font-family: Monaco;
-  font-size: 14px;
-  resize: none;
-}
-    ```
