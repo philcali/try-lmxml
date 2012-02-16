@@ -40,6 +40,7 @@
 
 [compiler]:
   >.span6
+    h2 "LMXML"
     form { method: "POST" }
       textarea .lmxml {
         autofocus: "autofocus",
@@ -54,7 +55,8 @@ data
      locations
        place name
         ```
-      textarea .lmxml @name="lmxml-json"
+      h2 "JSON Data"
+      textarea .lmxml .json @name="lmxml-json"
         ```
 {
   "people": [
@@ -76,6 +78,7 @@ data
 
 [output]:
   >.span6
+    h2 "Output"
     pre .lmxml_output
       ```
 <data>
@@ -144,7 +147,9 @@ $(document).ready (function() {
       }
     }
 
-    if (event.metaKey == 1 && keyCode == 13) {
+    var meta = (event.ctrlKey == 1 || event.metaKey == 1);
+
+    if (meta && keyCode == 13) {
       event.preventDefault();
 
       runCode();

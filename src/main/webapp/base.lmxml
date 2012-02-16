@@ -46,12 +46,16 @@ pre {
   font-size: 14px;
 }
 
-textarea {
+.lmxml {
   width: 459px;
-  height: 320px;
+  height: 290px;
   border: none;
   font-family: Monaco;
   font-size: 14px;
   resize: none;
+}
+
+.json {
+  height: 200px;
 }
     ```
