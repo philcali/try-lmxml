@@ -27,9 +27,7 @@ object Lmxml extends LmxmlFactory with Conversion {
   def createParser(step: Int) = new PlainLmxmlParser(step) with HtmlShortcuts
 }
 
-object LmxmlPlan extends LmxmlFactory with FileHashes with Plan {
-  val storage = new AppEngineCache
- 
+class LmxmlPlan extends Plan with LmxmlFactory with FileLoading {
   lazy val base = config.getServletContext.getRealPath(".")
 
   def createParser(step: Int) = {
@@ -40,7 +38,7 @@ object LmxmlPlan extends LmxmlFactory with FileHashes with Plan {
 
   def intent = {
     case req @ GET(Path("/")) =>
-      val index = new java.io.File(base, "index.html")
+      val index = new java.io.File(base, "index.lmxml")
       val converted = this.fromFile(index)(XmlConvert)
 
       ContentType("text/html") ~>
