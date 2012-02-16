@@ -1,39 +1,53 @@
 package lmxml
 package web
 
+import template.FileTemplates
+import cache.FileHashes
+import shortcuts.html.HtmlShortcuts
+
+import unfiltered.filter.Plan
 import unfiltered.request._
 import unfiltered.response._
 
-import scala.io.Source.{fromFile => open}
-
 import javax.servlet.http.HttpServletRequest
 
-import xml.PrettyPrinter
+import scala.io.Source.{fromFile => open}
 
-case class Template(req: HttpRequest[HttpServletRequest]) {
-  def apply(name: String) = {
-    req.underlying.getRealPath(name + ".lmxml")
-  }
-}
+import xml.PrettyPrinter
 
 object LmxmlText extends 
   Params.Extract("lmxml-input", Params.first ~> Params.nonempty)
 
-object XmlFormat extends PrettyPrinter(150, 2) with Function1[xml.NodeSeq, String] {
-  def apply(nodes: xml.NodeSeq) = formatNodes(nodes)
+object XmlFormat extends Function1[xml.NodeSeq, String] {
+  val printer = new PrettyPrinter(150, 2)
+  def apply(nodes: xml.NodeSeq) = printer.formatNodes(nodes)
 }
 
-/** unfiltered plan */
-class LmxmlPlan extends unfiltered.filter.Planify({
-  case req @ GET(Path("/")) =>
-    val converted = Lmxml.fromFile(Template(req)("index"))(XmlConvert)
+object Lmxml extends LmxmlFactory with Conversion {
+  def createParser(step: Int) = new PlainLmxmlParser(step) with HtmlShortcuts
+}
 
-    ContentType("text/html") ~>
-    ResponseString(converted.toString)
-  case POST(Path("/") & Params(LmxmlText(text))) =>
-    val process = XmlConvert andThen XmlFormat
+object LmxmlPlan extends LmxmlFactory with FileHashes with Plan {
+  val storage = new AppEngineCache
+ 
+  lazy val base = config.getServletContext.getRealPath(".")
 
-    val resp = Lmxml(text).safeParseNodes(text).fold(_.toString, process)
+  def createParser(step: Int) = {
+    new PlainLmxmlParser(step) with HtmlShortcuts with FileTemplates {
+      val working = new java.io.File(base)
+    }
+  }
 
-    ContentType("text/plain") ~> ResponseString(resp)
-});
+  def intent = {
+    case req @ GET(Path("/")) =>
+      val index = new java.io.File(base, "index.html")
+      val converted = this.fromFile(index)(XmlConvert)
+
+      ContentType("text/html") ~>
+      ResponseString(converted.toString)
+    case POST(Path("/") & Params(LmxmlText(text))) =>
+      val process = XmlConvert andThen XmlFormat
+      val resp = Lmxml(text).safeParseNodes(text).fold(_.toString, process)
+      ContentType("text/plain") ~> ResponseString(resp)
+  }
+}
