@@ -6,7 +6,6 @@ import cache.{
   FileHashStorage
 }
 
-import java.util.{ HashMap => JMap }
 import java.io.{
   File,
   ByteArrayOutputStream,
@@ -23,12 +22,10 @@ import scalendar._
 object AppEngineCache extends FileHashStorage {
   val cache = MemcacheServiceFactory.getMemcacheService("try-lmxml")
 
-  def defaultExpiration = {
-    Expiration.byDeltaMillis(1.month.into.milliseconds.toInt)
-  }
+  def defaultExpiration = Expiration.onDate(Scalendar.now + 1.month)
 
   def store(source: File, nodes: Seq[ParsedNode]) {
-    val byteStream = new ByteArrayOutputStream() 
+    val byteStream = new ByteArrayOutputStream()
 
     DefaultPacker.serialize(nodes, byteStream)
 

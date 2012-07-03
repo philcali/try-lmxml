@@ -5,6 +5,7 @@ import template.FileTemplates
 import cache.FileHashes
 import shortcuts.html.HtmlShortcuts
 import transforms.json.JSTransform
+import markdown.MarkdownParsing
 
 import unfiltered.filter.Plan
 import unfiltered.request._
@@ -16,7 +17,7 @@ import scala.io.Source.{fromFile => open}
 
 import xml.PrettyPrinter
 
-object LmxmlText extends 
+object LmxmlText extends
   Params.Extract("lmxml-input", Params.first ~> Params.nonempty)
 
 object JSonText extends
@@ -33,7 +34,8 @@ class LmxmlPlan extends Plan with LmxmlFactory with FileHashes {
   lazy val base = config.getServletContext.getRealPath(".")
 
   def createParser(step: Int) = {
-    new PlainLmxmlParser(step) with HtmlShortcuts with FileTemplates {
+    new PlainLmxmlParser(step)
+      with MarkdownParsing with HtmlShortcuts with FileTemplates {
       val working = new java.io.File(base)
     }
   }
@@ -46,7 +48,7 @@ class LmxmlPlan extends Plan with LmxmlFactory with FileHashes {
       ContentType("text/html") ~>
       ResponseString(converted.toString)
     case POST(Path("/") & Params(LmxmlText(text)) & Params(JSonText(jsonStr))) =>
-      val js = JSTransform(jsonStr).getOrElse(transforms.Transform())
+      val js = JSTransform().parse(jsonStr)
 
       val process = js andThen XmlConvert andThen XmlFormat
 
