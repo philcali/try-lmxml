@@ -7,6 +7,8 @@ import shortcuts.html.HtmlShortcuts
 import transforms.json.JSTransform
 import markdown.MarkdownParsing
 
+import converters.json.JsonConvert
+
 import unfiltered.filter.Plan
 import unfiltered.request._
 import unfiltered.response._
@@ -17,16 +19,19 @@ import scala.io.Source.{fromFile => open}
 
 import xml.PrettyPrinter
 
+import util.parsing.json.{
+  JSONObject,
+  JSONArray
+}
+
 object LmxmlText extends
   Params.Extract("lmxml-input", Params.first ~> Params.nonempty)
 
-object JSonText extends
+object JsonText extends
   Params.Extract("lmxml-json", Params.first ~> Params.nonempty)
 
-object XmlFormat extends Function1[xml.NodeSeq, String] {
-  val printer = new PrettyPrinter(150, 2)
-  def apply(nodes: xml.NodeSeq) = printer.formatNodes(nodes)
-}
+object LmxmlConversion extends
+  Params.Extract("lmxml-conversion", Params.first ~> Params.nonempty)
 
 class LmxmlPlan extends Plan with LmxmlFactory with FileHashes {
   val storage = AppEngineCache
@@ -47,10 +52,16 @@ class LmxmlPlan extends Plan with LmxmlFactory with FileHashes {
 
       ContentType("text/html") ~>
       ResponseString(converted.toString)
-    case POST(Path("/") & Params(LmxmlText(text)) & Params(JSonText(jsonStr))) =>
+    case POST(Path("/") &
+         Params(LmxmlText(text)) &
+         Params(JsonText(jsonStr)) &
+         Params(LmxmlConversion(source))) =>
       val js = JSTransform().parse(jsonStr)
 
-      val process = js andThen XmlConvert andThen XmlFormat
+      val process = js andThen (source match {
+        case "json" => JsonConvert andThen (_.toString())
+        case _ => XmlConvert andThen XmlFormat(200, 2)
+      })
 
       val resp = apply(text).safeParseNodes(text).fold(_.toString, process)
       ContentType("text/plain") ~> ResponseString(resp)

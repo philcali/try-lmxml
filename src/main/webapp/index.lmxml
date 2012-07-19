@@ -12,8 +12,17 @@
       >#error .alert-message .error .fade .in @style: "display: none;"
         p "Error Loading Request... Try again?"
       >.row
-        >.span12 
+        >.span6
           span #reference .label .notice "Reference"
+        >.span6
+          form.form-horizontal
+            fieldset
+              >.control-group
+                label.control-label @for="lmxml-conversion" "Conversion"
+                >.controls
+                  select#lmxml-conversion
+                    option@selected @value="xml" "XML"
+                    option @value="json" "JSON"
       >.row
         [output]
         [compiler]
@@ -22,7 +31,7 @@
   ul
     li "Nodes are single words without spaces"
     li "Plain text is quoted is quoted"
-    li "Multi-line text is fenced in with " code "```" 
+    li "Multi-line text is fenced in with " code "~~~"
     li "Indention is important, denoting sibling nodes and new-lines (default is 2 spaces)"
     li "JSON-style attributes"
     li "Attributes can be prefixed with " code "@"
@@ -32,7 +41,7 @@
     li "Markdown Indirect link style templates"
     li "Indirect definitions are delimited from main document by " code "---"
     li "Unparsed text is suffixed with " code "is unescaped"
-  span 
+  span
     "More in-depth "
       a @href = "https://github.com/philcali/lmxml/wiki/Syntax"
         "syntax explanations"
@@ -46,7 +55,7 @@
         autofocus: "autofocus",
         name: "lmxml-input"
       }
-        ```
+        ~~~
 data
    persons
      people
@@ -54,10 +63,10 @@ data
    places
      locations
        place name
-        ```
+        ~~~
       h2 "JSON Data"
       textarea .lmxml .json @name="lmxml-json"
-        ```
+        ~~~
 {
   "people": [
     { "name": "Tomcar", "age": 999 },
@@ -68,10 +77,10 @@ data
     { "name": "Their Home" }
   ]
 }
-        ```
-      input #run_link { 
-        class: "btn primary", 
-        type: "submit", 
+        ~~~
+      input #run_link {
+        class: "btn primary",
+        type: "submit",
         value: "Run Code"
       }
       p small "Also run with ctrl / cmd (on Mac) + enter"
@@ -80,7 +89,7 @@ data
   >.span6
     h2 "Output"
     pre .lmxml_output
-      ```
+      ~~~
 <data>
    <persons>
      <person name="Tomcar" age="999"></person>
@@ -91,13 +100,13 @@ data
      <place>Their Home</place>
    </places>
 </data>
-      ```
+      ~~~
 
 [try]: "Try LMXML"
 
-[javascript]: 
-  script { type: "text/javascript" }
-    ```
+[javascript]:
+  js
+    ~~~
 //<![CDATA[
 $(document).ready (function() {
 
@@ -128,7 +137,7 @@ $(document).ready (function() {
 
     if (keyCode == 9) {
       event.preventDefault();
-      
+
       if (t.selectionStart == t.selectionEnd) {
         t.value = t.value.slice(0, start).concat(tab).concat( 
                   t.value.slice(start, t.value.length));
@@ -160,6 +169,7 @@ $(document).ready (function() {
     $(".lmxml").attr("disabled", true);
 
     var params = {
+      "lmxml-conversion": $("#lmxml-conversion").val(),
       "lmxml-input": $("textarea[name=lmxml-input]").val(),
       "lmxml-json":  $("textarea[name=lmxml-json]").val()
     };
@@ -171,4 +181,4 @@ $(document).ready (function() {
   }
 });
 //]]
-    ``` is unescaped
+    ~~~ is unescaped
